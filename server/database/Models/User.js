@@ -39,10 +39,10 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    followes: [String], // username
+    followers: [String], // username
     following: [String],
-    posts: [String], // urls
-    likes: [String], // urls
+    posts: [String], // post id
+    likes: [String],
     saved: [String],
     createdAt: {
         type: Date,

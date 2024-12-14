@@ -9,6 +9,10 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const socketio = require('socket.io');
 const User = require('../database/Models/User');
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+const Post = require('../database/Models/Post');
 
 app.use(cors({
     origin: `http://localhost:3000`,
@@ -107,6 +111,54 @@ app.post('/otp', async (req, res) => {
         res.status(400).send(error);
     }
 });
+
+
+app.post('/getUser', async (req, res) => {
+    const { username } = req.body;
+    const user = await User.findOne({ name: username });
+    if (user) return res.status(200).send(user);
+    res.status(400).send("User does not exist in database");
+})
+
+
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'uploads',
+        resource_type: 'auto',
+    }
+});
+
+const upload = multer({ storage: storage, limits: { fileSize: 10000000 } });
+
+app.post('/fileupload', upload.single('uploadfile'), async (req, res) => {
+    const { username } = req.body;
+
+    const post = new Post({
+        user: username,
+        url: req.file.path,
+    });
+    await post.save();
+
+    const user = await User.findOne({ name: username });
+    user.posts.push(post._id.toString());
+    await user.save();
+    res.status(200).send(post);
+});
+
+
+app.post('/getUserPosts', async (req, res) => {
+    const { username } = req.body;
+    const posts = await Post.find({ user: username });
+    res.status(200).send(posts);
+})
 
 
 io.on('connection', (socket) => {
