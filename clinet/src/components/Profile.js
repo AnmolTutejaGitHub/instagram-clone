@@ -30,8 +30,11 @@ function Profile() {
     }
 
     useEffect(() => {
-        if (location.state) setUserObj(location.state.userObj);
-        else getUserData();
+        if (location.state && location.state.userObj) setUserObj(location.state.userObj);
+        else {
+            getUserData();
+            if (location.pathname.includes("posts")) navigate('/profile/posts', { state: userObj });
+        }
     }, [])
 
     return (<div className='flex justify-center gap-4 flex-col items-center'>

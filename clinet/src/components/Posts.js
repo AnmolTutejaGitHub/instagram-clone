@@ -26,7 +26,7 @@ function Post() {
 
         const formData = new FormData();
         formData.append('uploadfile', file);
-        formData.append('username', userObj.name);
+        formData.append('username', userObj?.name);
 
         try {
             const response = await fetch(`http://localhost:8080/fileupload`, {
@@ -47,7 +47,7 @@ function Post() {
 
     async function GetUserPosts() {
         const response = await axios.post(`http://localhost:8080/getUserPosts`, {
-            username: userObj.name
+            username: userObj?.name
         })
         setPosts(response.data);
     }
