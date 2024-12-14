@@ -37,6 +37,22 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    followes: [String], // username
+    following: [String],
+    posts: [String], // urls
+    likes: [String], // urls
+    saved: [String],
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    profilePicture: {
+        type: String,
+    },
+    bio: {
+        type: String,
+        maxLength: 160,
+    },
 })
 
 userSchema.pre('save', async function (next) {
