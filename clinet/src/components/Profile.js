@@ -5,12 +5,17 @@ import { RiSettings3Fill } from "react-icons/ri";
 import { CiBookmark } from "react-icons/ci";
 import { MdOutlineGridOn } from "react-icons/md";
 import { Routes, Route, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Posts from './Posts';
 import Saved from './Saved';
 
 function Profile() {
     const { user, setUser } = useContext(UserContext);
     const [userObj, setUserObj] = useState({});
+    const navigate = useNavigate();
+    const location = useLocation();
+    const state = location.state;
+    console.log(state);
 
     async function getUserData() {
         try {
@@ -25,7 +30,8 @@ function Profile() {
     }
 
     useEffect(() => {
-        getUserData();
+        if (location.state) setUserObj(location.state.userObj);
+        else getUserData();
     }, [])
 
     return (<div className='flex justify-center gap-4 flex-col items-center'>
@@ -37,16 +43,31 @@ function Profile() {
 
             <div>
                 <div className='flex gap-2 items-center'>
-                    <p>{user}</p>
-                    <button className='font-bold bg-[#454444] p-2 rounded-lg text-sm'>Edit Profile</button>
-                    <div className='text-xl'><RiSettings3Fill /></div>
+                    <p>{userObj.name}</p>
+                    {user == userObj.name && <>
+                        <button className='font-bold bg-[#454444] p-2 rounded-lg text-sm'>Edit Profile</button>
+                        <div className='text-xl'><RiSettings3Fill /></div>
+                    </>}
                 </div>
                 <div className='flex gap-2'>
                     <p>{userObj?.posts?.length} posts</p>
-                    <p>{userObj?.followers?.length} followers</p>
-                    <p>{userObj?.following?.length} following</p>
+                    <p onClick={() =>
+                        navigate('/list', {
+                            state: { list: userObj?.followers },
+                        })}>{userObj?.followers?.length} followers</p>
+
+                    <p onClick={() =>
+                        navigate('/list', {
+                            state: { list: userObj?.following },
+                        })}>{userObj?.following?.length} following</p>
                 </div>
                 <div>Bio { }</div>
+                {user != userObj.name &&
+                    <div className='flex gap-2 pt-4'>
+                        <div className='bg-[#363636] p-2 rounded-md text-sm cursor-pointer'>Message</div>
+                        <div className='bg-[#1977F2] p-2 rounded-md text-sm cursor-pointer'>Follow</div>
+                    </div>
+                }
             </div>
         </div>
 
@@ -60,10 +81,10 @@ function Profile() {
                         <Link to="/profile/posts" state={userObj} className="hover:text-gray-400">POSTS</Link>
                     </div>
 
-                    <div className='flex gap-2 items-center text-sm'>
+                    {user === userObj.name && <div className='flex gap-2 items-center text-sm'>
                         <CiBookmark />
                         <Link to="/profile/saved" state={userObj} className="hover:text-gray-400">SAVED</Link>
-                    </div>
+                    </div>}
                 </div>
             </div>
             <Routes>

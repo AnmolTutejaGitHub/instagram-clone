@@ -1,13 +1,15 @@
 import { TbWorldUpload } from "react-icons/tb";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useLocation } from "react-router-dom";
 import toast, { Toaster } from 'react-hot-toast';
+import UserContext from '../context/UserContext';
 import axios from 'axios';
 
 function Post() {
     const location = useLocation();
     const userObj = location.state;
     const [posts, setPosts] = useState([]);
+    const { user, setUser } = useContext(UserContext);
 
     async function handleFileSubmit(e) {
         e.preventDefault();
@@ -61,13 +63,13 @@ function Post() {
 
     return (<div className="flex justify-center items-center flex-col">
 
-        <div className="p-2">
+        {user == userObj.name && <div className="p-2">
             <form onSubmit={(e) => handleFileSubmit(e)} encType="multipart/form-data" className="uploadform flex gap-2 items-center">
                 <input type="file" name="uploadfile" id="uploadfile" required className="hidden" />
                 <label for="uploadfile"><TbWorldUpload /></label>
                 <button type="submit">Create</button>
             </form>
-        </div>
+        </div>}
 
         <div className="flex flex-wrap gap-2 justify-center">{renderPosts}</div>
     </div>)

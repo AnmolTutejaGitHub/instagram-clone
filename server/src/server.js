@@ -160,6 +160,33 @@ app.post('/getUserPosts', async (req, res) => {
     res.status(200).send(posts);
 })
 
+app.post('/follow', async (req, res) => {
+    const { followHim, follower } = req.body;
+    const user1 = await User.findOne({ name: followHim });
+    const user2 = await User.findOne({ name: follower });
+
+    if (!user2.following.includes(user1.name)) {
+        user2.following.push(user1.name);
+        user1.followers.push(user2.name);
+        await user1.save();
+        await user2.save();
+    }
+    res.status(200).send("followed");
+})
+
+app.post('/getFollowers', async (req, res) => {
+    const { username } = req.body;
+    const user = await User.findOne({ name: username });
+    res.status(200).send(user.followers);
+})
+
+app.post('/searchUser', async (req, res) => {
+    const { searchTerm } = req.body;
+    const user = await User.findOne({ name: searchTerm });
+    if (user) return res.status(200).send(user);
+    res.status(400).send("User doesn't exist");
+})
+
 
 io.on('connection', (socket) => {
     socket.on('error', (error) => {
