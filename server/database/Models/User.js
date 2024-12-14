@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 
+const { storySchema } = require('./Stroy');
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -53,6 +55,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         maxLength: 160,
     },
+    stories: [storySchema],
 })
 
 userSchema.pre('save', async function (next) {
