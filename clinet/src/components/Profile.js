@@ -49,7 +49,6 @@ function Profile() {
                 setUserObj(location.state.userObj);
             } else {
                 getUserData();
-
                 if (location.pathname.includes("posts")) {
                     navigate('/profile/posts', { state: { userObj: userObj } });
                 }
@@ -59,6 +58,10 @@ function Profile() {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (location.pathname.includes('/profile/post') && Object.keys(userObj).length === 0) navigate('/profile');
+    })
 
 
     async function follow() {
