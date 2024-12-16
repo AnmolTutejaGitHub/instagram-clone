@@ -174,6 +174,20 @@ app.post('/follow', async (req, res) => {
     res.status(200).send("followed");
 })
 
+app.post('/unfollow', async (req, res) => {
+    const { unfollowHim, follower } = req.body;
+    const user1 = await User.findOne({ name: unfollowHim });
+    const user2 = await User.findOne({ name: follower });
+
+    if (user2.following.includes(user1.name)) {
+        user2.following = user2.following.filter((f) => f != user1.name);
+        user1.followers = user1.followers.filter((f) => f != user2.name);
+        await user1.save();
+        await user2.save();
+    }
+    res.status(200).send("unfollowed");
+})
+
 app.post('/getFollowers', async (req, res) => {
     const { username } = req.body;
     const user = await User.findOne({ name: username });
@@ -185,6 +199,15 @@ app.post('/searchUser', async (req, res) => {
     const user = await User.findOne({ name: searchTerm });
     if (user) return res.status(200).send(user);
     res.status(400).send("User doesn't exist");
+})
+
+app.post('/isFollowing', async (req, res) => {
+    const { followingUser, followedUser } = req.body;
+    const user1 = await User.findOne({ name: followingUser });
+    const user2 = await User.findOne({ name: followedUser });
+
+    if (user1 && user2 && user1.following.includes(user2.name)) return res.status(200).send("Following");
+    res.status(400).send("Not Following");
 })
 
 

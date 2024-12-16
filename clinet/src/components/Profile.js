@@ -15,7 +15,7 @@ function Profile() {
     const navigate = useNavigate();
     const location = useLocation();
     const state = location.state;
-    console.log(state);
+    const [isFollowing, setisFollowing] = useState(false);
 
     async function getUserData() {
         try {
@@ -23,19 +23,70 @@ function Profile() {
                 username: user
             })
             console.log(response.data);
-            if (response.status == 200) setUserObj(response.data);
+            setUserObj(response.data);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    async function checkIsFollowing() {
+        if (!location.state) return;
+        if (user == userObj?.name) return;
+        try {
+            const response = await axios.post(`http://localhost:8080/isFollowing`, {
+                followingUser: user,
+                followedUser: location.state.userObj.name
+            })
+            setisFollowing(true);
         } catch (e) {
             console.log(e);
         }
     }
 
     useEffect(() => {
-        if (location.state && location.state.userObj) setUserObj(location.state.userObj);
-        else {
-            getUserData();
-            if (location.pathname.includes("posts")) navigate('/profile/posts', { state: userObj });
+        const fetchData = async () => {
+            if (location.state && location.state.userObj) {
+                setUserObj(location.state.userObj);
+            } else {
+                getUserData();
+
+                if (location.pathname.includes("posts")) {
+                    navigate('/profile/posts', { state: { userObj: userObj } });
+                }
+            }
+            if (location.state) checkIsFollowing();
+        };
+
+        fetchData();
+    }, []);
+
+
+    async function follow() {
+        try {
+            const response = await axios.post(`http://localhost:8080/follow`, {
+                followHim: userObj.name,
+                follower: user
+            })
+            setisFollowing(true);
+            setUserObj({ ...userObj, followers: [...userObj.followers, user] });
+        } catch (e) {
+            console.log(e);
         }
-    }, [])
+
+    }
+
+    async function unFollow() {
+        try {
+            const response = await axios.post(`http://localhost:8080/unfollow`, {
+                unfollowHim: userObj.name,
+                follower: user
+            })
+            setisFollowing(false);
+            setUserObj({ ...userObj, followers: userObj.followers.filter((f) => f !== user) });
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     return (<div className='flex justify-center gap-4 flex-col items-center'>
 
@@ -46,8 +97,8 @@ function Profile() {
 
             <div>
                 <div className='flex gap-2 items-center'>
-                    <p>{userObj.name}</p>
-                    {user == userObj.name && <>
+                    <p>{userObj?.name}</p>
+                    {user == userObj?.name && <>
                         <button className='font-bold bg-[#454444] p-2 rounded-lg text-sm'>Edit Profile</button>
                         <div className='text-xl'><RiSettings3Fill /></div>
                     </>}
@@ -65,10 +116,11 @@ function Profile() {
                         })}>{userObj?.following?.length} following</p>
                 </div>
                 <div>Bio { }</div>
-                {user != userObj.name &&
+                {user != userObj?.name &&
                     <div className='flex gap-2 pt-4'>
                         <div className='bg-[#363636] p-2 rounded-md text-sm cursor-pointer'>Message</div>
-                        <div className='bg-[#1977F2] p-2 rounded-md text-sm cursor-pointer'>Follow</div>
+                        {!isFollowing && <div className='bg-[#1977F2] p-2 rounded-md text-sm cursor-pointer' onClick={follow}>Follow</div>}
+                        {isFollowing && <div className='bg-[#363636] p-2 rounded-md text-sm cursor-pointer' onClick={unFollow}>Following</div>}
                     </div>
                 }
             </div>
@@ -84,7 +136,7 @@ function Profile() {
                         <Link to="/profile/posts" state={userObj} className="hover:text-gray-400">POSTS</Link>
                     </div>
 
-                    {user === userObj.name && <div className='flex gap-2 items-center text-sm'>
+                    {user === userObj?.name && <div className='flex gap-2 items-center text-sm'>
                         <CiBookmark />
                         <Link to="/profile/saved" state={userObj} className="hover:text-gray-400">SAVED</Link>
                     </div>}
