@@ -210,6 +210,21 @@ app.post('/isFollowing', async (req, res) => {
     res.status(400).send("Not Following");
 })
 
+app.post('/getList', async (req, res) => {
+    const { followerlist, username } = req.body;
+    const user = await User.findOne({ name: username });
+    if (followerlist) return res.status(200).send(user.followers);
+    res.status(200).send(user.following);
+})
+
+
+app.post('/getFollowingPosts', async (req, res) => {
+    const { username } = req.body;
+    const user = await User.findOne({ name: username });
+    const posts = await Post.find({ user: { $in: user.following } }).sort({ createdAt: -1 });
+    res.status(200).send(posts);
+})
+
 
 io.on('connection', (socket) => {
     socket.on('error', (error) => {

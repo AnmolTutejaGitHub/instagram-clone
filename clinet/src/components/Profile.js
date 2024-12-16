@@ -117,13 +117,11 @@ function Profile() {
                 <div className='flex gap-2'>
                     <p>{userObj?.posts?.length} posts</p>
                     <p onClick={() =>
-                        navigate('/list', {
-                            state: { list: userObj?.followers },
+                        navigate(`/list?followerlist=true&searchuser=${searchuser}`, {
                         })}>{userObj?.followers?.length} followers</p>
 
                     <p onClick={() =>
-                        navigate('/list', {
-                            state: { list: userObj?.following },
+                        navigate(`/list?followerlist=false&searchuser=${searchuser}`, {
                         })}>{userObj?.following?.length} following</p>
                 </div>
                 <div>Bio { }</div>
