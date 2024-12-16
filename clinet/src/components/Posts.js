@@ -4,12 +4,30 @@ import { useLocation } from "react-router-dom";
 import toast, { Toaster } from 'react-hot-toast';
 import UserContext from '../context/UserContext';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
 function Post() {
-    const location = useLocation();
-    const userObj = location.state;
+    // const location = useLocation();
+    // const userObj = location.state;
+    const [userObj, setUserObj] = useState({});
     const [posts, setPosts] = useState([]);
+    const [searchParams] = useSearchParams();
+    const searchuser = searchParams.get("searchuser");
     const { user, setUser } = useContext(UserContext);
+
+    useEffect(() => {
+        getUserData();
+    }, [])
+    async function getUserData() {
+        try {
+            const response = await axios.post(`http://localhost:8080/getUser`, {
+                username: searchuser
+            })
+            setUserObj(response.data);
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     async function handleFileSubmit(e) {
         e.preventDefault();

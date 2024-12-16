@@ -19,7 +19,7 @@ function Home() {
             });
             const data = response.data;
             setUserObj(data);
-            navigate('/profile', { state: { userObj: data } });
+            navigate(`/profile?searchuser=${data.name}`); // chanded logic will fix above unnecessay api call later
         } catch (e) {
             console.log(e);
         }

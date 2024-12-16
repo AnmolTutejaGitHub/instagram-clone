@@ -6,6 +6,7 @@ import { CiBookmark } from "react-icons/ci";
 import { MdOutlineGridOn } from "react-icons/md";
 import { Routes, Route, Link } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Posts from './Posts';
 import Saved from './Saved';
 
@@ -13,16 +14,24 @@ function Profile() {
     const { user, setUser } = useContext(UserContext);
     const [userObj, setUserObj] = useState({});
     const navigate = useNavigate();
-    const location = useLocation();
-    const state = location.state;
+    // const location = useLocation();
+    // const state = location.state;
+
+    const [searchParams] = useSearchParams();
+    const searchuser = searchParams.get("searchuser");
+
     const [isFollowing, setisFollowing] = useState(false);
 
+
+    useEffect(() => {
+        getUserData();
+        if (user != searchuser) checkIsFollowing();
+    })
     async function getUserData() {
         try {
             const response = await axios.post(`http://localhost:8080/getUser`, {
-                username: user
+                username: searchuser
             })
-            console.log(response.data);
             setUserObj(response.data);
         } catch (e) {
             console.log(e);
@@ -30,12 +39,11 @@ function Profile() {
     }
 
     async function checkIsFollowing() {
-        if (!location.state) return;
         if (user == userObj?.name) return;
         try {
             const response = await axios.post(`http://localhost:8080/isFollowing`, {
                 followingUser: user,
-                followedUser: location.state.userObj.name
+                followedUser: searchuser
             })
             setisFollowing(true);
         } catch (e) {
@@ -43,25 +51,25 @@ function Profile() {
         }
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (location.state && location.state.userObj) {
-                setUserObj(location.state.userObj);
-            } else {
-                getUserData();
-                if (location.pathname.includes("posts")) {
-                    navigate('/profile/posts', { state: { userObj: userObj } });
-                }
-            }
-            if (location.state) checkIsFollowing();
-        };
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         if (location.state && location.state.userObj) {
+    //             setUserObj(location.state.userObj);
+    //         } else {
+    //             getUserData();
+    //             if (location.pathname.includes("posts")) {
+    //                 navigate('/profile/posts', { state: { userObj: userObj } });
+    //             }
+    //         }
+    //         if (location.state) checkIsFollowing();
+    //     };
 
-        fetchData();
-    }, []);
+    //     fetchData();
+    // }, []);
 
-    useEffect(() => {
-        if (location.pathname.includes('/profile/post') && Object.keys(userObj).length === 0) navigate('/profile');
-    })
+    // useEffect(() => {
+    //     if (location.pathname.includes('/profile/post') && Object.keys(userObj).length === 0) navigate('/profile');
+    // })
 
 
     async function follow() {
@@ -136,12 +144,12 @@ function Profile() {
                 <div className='flex gap-8'>
                     <div className='flex gap-2 items-center text-sm'>
                         <MdOutlineGridOn />
-                        <Link to="/profile/posts" state={userObj} className="hover:text-gray-400">POSTS</Link>
+                        <Link to={`/profile/posts?searchuser=${searchuser}`} className="hover:text-gray-400">POSTS</Link>
                     </div>
 
                     {user === userObj?.name && <div className='flex gap-2 items-center text-sm'>
                         <CiBookmark />
-                        <Link to="/profile/saved" state={userObj} className="hover:text-gray-400">SAVED</Link>
+                        <Link to={`/profile/saved?searchuser=${searchuser}`} className="hover:text-gray-400">SAVED</Link>
                     </div>}
                 </div>
             </div>
