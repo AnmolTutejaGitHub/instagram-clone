@@ -101,7 +101,7 @@ function Home() {
                     src={userObj.profilePicture || `https://avatar.iran.liara.run/public/boy`}
                     className='w-14'
                 />
-                <FaPlus className='absolute bottom-2 right-[-1px]' />
+                <FaPlus className='absolute bottom-2 right-[-1px] bg-blue-600 p-1 rounded-xl' />
             </div>
         </div>
 

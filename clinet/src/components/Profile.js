@@ -110,8 +110,8 @@ function Profile() {
                 <div className='flex gap-2 items-center'>
                     <p>{userObj?.name}</p>
                     {user == userObj?.name && <>
-                        <button className='font-bold bg-[#454444] p-2 rounded-lg text-sm'>Edit Profile</button>
-                        <div className='text-xl'><RiSettings3Fill /></div>
+                        <button className='font-bold bg-[#454444] p-2 rounded-lg text-sm' onClick={() => navigate('/settings')}>Edit Profile</button>
+                        <div className='text-xl cursor-pointer' onClick={() => navigate('/settings')}><RiSettings3Fill /></div>
                     </>}
                 </div>
                 <div className='flex gap-2'>
