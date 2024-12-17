@@ -7,6 +7,7 @@ import List from './components/List';
 import Settings from './components/Settings';
 import Navbar from './components/Navbar';
 import Reels from './components/Reels';
+import Post from './components/Post';
 
 function App() {
     return (<div className='bg-black w-full h-full text-white'>
@@ -18,6 +19,7 @@ function App() {
             <Route path="/settings" element={<Settings />}></Route>
             <Route path="/navbar" element={<Navbar />}></Route>
             <Route path="/reels" element={<Reels />}></Route>
+            <Route path="/post" element={<Post />}></Route>
         </Routes>
         <Navbar />
     </div>);

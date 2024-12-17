@@ -70,6 +70,7 @@ function Post() {
         setPosts(response.data);
     }
 
+
     useEffect(() => {
         GetUserPosts();
     })

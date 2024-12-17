@@ -70,7 +70,7 @@ function Home() {
     const renderFollowingPosts = followingposts.map((post) => {
         const isVideo = post.url.endsWith('.mp4') || post.url.endsWith('.webm');
         if (isVideo) return;
-        return <div className='p-4 border-t border-b border-[#262626] flex gap-3 flex-col'>
+        return <div className='p-4 border-t border-b border-[#262626] flex gap-3 flex-col' onClick={() => navigate(`/post?postid=${post._id}`)}>
             <div className='flex flex-row justify-between'>
                 <p>{post.user}</p>
                 <p className='text-[#A8A8A8]'>{post.createdAt}</p>
@@ -88,6 +88,14 @@ function Home() {
             <div>{post.likes.length} likes</div>
         </div>
     })
+
+
+    async function likePost(post) {
+        const response = await axios.post(`http://localhost:8080/likePost`, {
+            postid: post._id
+        })
+        post.likes.push(user);
+    }
 
 
     return (<div>

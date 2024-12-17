@@ -239,6 +239,71 @@ app.post('/editProfile', async (req, res) => {
     res.status(200).send("success");
 })
 
+app.post('/getPost', async (req, res) => {
+    const { postid } = req.body;
+    const post = await Post.findById(postid);
+    if (!post) res.status(400).send("Deleted by creator");
+    res.status(200).send(post);
+})
+
+app.post('/likePost', async (req, res) => {
+    const { postid, username } = req.body;
+    const post = await Post.findById(postid);
+    post.likes.push(username);
+    await post.save();
+    res.status(200).send("post liked");
+})
+
+app.post('/wasLiked', async (req, res) => {
+    const { postid, username } = req.body;
+    const post = await Post.findById(postid);
+    if (!post) return res.status(400).send("Post deleted");
+    if (post.likes.includes(username)) return res.status(200).send("liked");
+    res.status(400).send("Not Liked");
+})
+
+app.post('/unlikepost', async (req, res) => {
+    const { postid, username } = req.body;
+    const post = await Post.findById(postid);
+    if (!post) return res.status(400).send("Post deleted");
+    if (post.likes.includes(username)) {
+        post.likes = post.likes.filter((u) => u != username);
+        await post.save();
+        return res.status(200).send(post);
+    }
+    res.status(400).send("Not found");
+})
+
+app.post('/savePost', async (req, res) => {
+    const { postid, username } = req.body;
+    const user = await User.findOne({ name: username });
+    user.saved.push(postid);
+    await user.save();
+    res.status(200).send("Saved");
+})
+
+app.post('/unSavePost', async (req, res) => {
+    const { postid, username } = req.body;
+    const user = await User.findOne({ name: username });
+    user.saved = user.saved.filter((id) => id != postid);
+    await user.save();
+    return res.status(200).send("Post Unsaved");
+})
+
+app.post('/wasSaved', async (req, res) => {
+    const { postid, username } = req.body;
+    const user = await User.findOne({ name: username });
+    if (user.saved.includes(postid)) return res.status(200).send("Saved");
+    res.status(400).send("Not Saved");
+
+})
+
+app.post('/getSavedPost', async (req, res) => {
+    const { username } = req.body;
+    const user = await User.findOne({ name: username });
+    res.status(200).send(user.saved);
+})
+
 
 io.on('connection', (socket) => {
     socket.on('error', (error) => {
