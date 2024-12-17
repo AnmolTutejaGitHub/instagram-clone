@@ -1,10 +1,13 @@
 import { useState, useContext, useEffect } from 'react';
 import UserContext from '../context/UserContext';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 
 function Settings() {
     const [userObj, setUserObj] = useState({});
     const { user, setUser } = useContext(UserContext);
+    const [bio, setBio] = useState('');
+    const [password, setPassword] = useState('');
 
     async function getUserData() {
         try {
@@ -15,6 +18,25 @@ function Settings() {
         } catch (e) {
             console.log(e);
         }
+    }
+
+
+    async function EditProfile() {
+        const toastId = toast.loading('Posting...');
+        try {
+            const response = await axios.post(`http://localhost:8080/editProfile`, {
+                bio: bio,
+                password: password,
+                username: user
+            })
+            toast.success('Updated!');
+        } catch (e) {
+            toast.error('An error occurred');
+            console.log(e);
+        } finally {
+            toast.dismiss(toastId);
+        }
+
     }
 
     useEffect(() => {
@@ -33,7 +55,7 @@ function Settings() {
 
             <div className='w-full flex flex-col gap-2'>
                 <p className='font-bold text-[16px]'>Bio</p>
-                <textarea className='w-[50%] bg-black outline-white p-2 border border-[#323539]' />
+                <textarea className='w-[50%] bg-black outline-white p-2 border border-[#323539]' value={bio} onChange={(e) => setBio(e.target.value)} />
             </div>
 
             <div className='flex flex-col gap-2'>
@@ -43,7 +65,15 @@ function Settings() {
                     <p className='text-gray-500 text-[12px]'>This won't be part of your public profile.</p>
                 </div>
             </div>
-            <button className='bg-[#0095F6] hover:bg-blue-500 w-16 p-2 rounded-md'>submit</button>
+
+            <div className='flex flex-col gap-2'>
+                <p>Change Password</p>
+                <div>
+                    <input className='bg-inherit outline-none border-b  border-white w-[50%]' onChange={(e) => setPassword(e.target.value)}></input>
+                </div>
+            </div>
+
+            <button className='bg-[#0095F6] hover:bg-blue-500 w-16 p-2 rounded-md' onClick={EditProfile}>submit</button>
         </div >)
 }
 export default Settings;

@@ -68,6 +68,8 @@ function Home() {
     }
 
     const renderFollowingPosts = followingposts.map((post) => {
+        const isVideo = post.url.endsWith('.mp4') || post.url.endsWith('.webm');
+        if (isVideo) return;
         return <div className='p-4 border-t border-b border-[#262626] flex gap-3 flex-col'>
             <div className='flex flex-row justify-between'>
                 <p>{post.user}</p>

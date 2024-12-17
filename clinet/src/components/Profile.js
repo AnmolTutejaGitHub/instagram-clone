@@ -124,7 +124,7 @@ function Profile() {
                         navigate(`/list?followerlist=false&searchuser=${searchuser}`, {
                         })}>{userObj?.following?.length} following</p>
                 </div>
-                <div>Bio { }</div>
+                <div className='pt-2'>{userObj.bio || 'Bio'}</div>
                 {user != userObj?.name &&
                     <div className='flex gap-2 pt-4'>
                         <div className='bg-[#363636] p-2 rounded-md text-sm cursor-pointer'>Message</div>

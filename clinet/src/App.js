@@ -17,7 +17,7 @@ function App() {
             <Route path="/list" element={<List />}></Route>
             <Route path="/settings" element={<Settings />}></Route>
             <Route path="/navbar" element={<Navbar />}></Route>
-            <Route path="/reels" element={<Navbar />}></Route>
+            <Route path="/reels" element={<Reels />}></Route>
         </Routes>
         <Navbar />
     </div>);

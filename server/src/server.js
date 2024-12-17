@@ -156,7 +156,7 @@ app.post('/fileupload', upload.single('uploadfile'), async (req, res) => {
 
 app.post('/getUserPosts', async (req, res) => {
     const { username } = req.body;
-    const posts = await Post.find({ user: username });
+    const posts = await Post.find({ user: username }).sort({ createdAt: -1 });;
     res.status(200).send(posts);
 })
 
@@ -223,6 +223,20 @@ app.post('/getFollowingPosts', async (req, res) => {
     const user = await User.findOne({ name: username });
     const posts = await Post.find({ user: { $in: user.following } }).sort({ createdAt: -1 });
     res.status(200).send(posts);
+})
+
+app.get('/getReels', async (req, res) => {
+    const videos = await Post.find({ url: { $regex: /\.(mp4|avi|mov|mkv|webm|flv)$/i } }).sort({ createdAt: -1 });
+    res.status(200).send(videos);
+})
+
+app.post('/editProfile', async (req, res) => {
+    const { bio, username, password } = req.body;
+    const user = await User.findOne({ name: username });
+    user.bio = bio;
+    if (password.trim() != '') user.password = password
+    await user.save();
+    res.status(200).send("success");
 })
 
 

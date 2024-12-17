@@ -75,9 +75,14 @@ function Post() {
     })
 
     const renderPosts = posts.map((post) => {
-        return (<img src={post.url} className="w-48"></img>)
-    })
+        const isVideo = post.url.endsWith('.mp4') || post.url.endsWith('.webm');
 
+        return isVideo ? (
+            <video src={post.url} className="w-48" controls />
+        ) : (
+            <img src={post.url} className="w-48" alt="post content" />
+        );
+    });
 
     return (<div className="flex justify-center items-center flex-col">
 
@@ -89,7 +94,7 @@ function Post() {
             </form>
         </div>}
 
-        <div className="flex flex-wrap gap-2 justify-center">{renderPosts}</div>
+        <div className="flex flex-wrap gap-10 justify-center">{renderPosts}</div>
     </div>)
 }
 export default Post;
