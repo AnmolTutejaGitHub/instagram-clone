@@ -7,6 +7,7 @@ import { CiBookmark } from "react-icons/ci";
 import UserContext from '../context/UserContext';
 import { FaHeart } from "react-icons/fa";
 import { GoBookmarkSlash } from "react-icons/go";
+import toast, { Toaster } from 'react-hot-toast';
 
 function Post() {
     const [searchParams] = useSearchParams();
@@ -16,6 +17,9 @@ function Post() {
     const [isLiked, setIsLiked] = useState(false);
     const [Comment, setComment] = useState('');
     const [saved, setSaved] = useState(false);
+    const [creator, setCreator] = useState(false);
+    const [caption, setCaption] = useState('');
+    const [isDisable, setDisable] = useState(true);
 
     async function getPost() {
         try {
@@ -23,6 +27,9 @@ function Post() {
                 postid: postid
             })
             setPost(response.data);
+            if (response.data.user == user) setCreator(true);
+            if (response.data.user == user) setDisable(false);
+
         } catch (e) {
             console.log("Post does not exist");
             console.log(e);
@@ -86,6 +93,22 @@ function Post() {
         }
     }
 
+    async function EditCaption() {
+        const toastId = toast.loading('Editing...');
+        try {
+            const response = await axios.post(`http://localhost:8080/editCaption`, {
+                postid: postid,
+                caption: caption
+            })
+            toast.success('Edited!');
+        } catch (e) {
+            toast.error('An error occurred');
+            console.log(e);
+        } finally {
+            toast.dismiss(toastId);
+        }
+    }
+
     useEffect(() => {
         getData();
     }, [])
@@ -116,6 +139,13 @@ function Post() {
                     </div>
                 </div>
                 <div>{post.likes?.length} likes</div>
+
+                <div className="flex gap-2">
+                    <input className={`bg-inherit outline-none ${creator ? 'border-b border-white w-[95%]' : ''}`} defaultValue={post.caption} onChange={(e) => setCaption(e.target.value)} disabled={isDisable}></input>
+                    {creator &&
+                        <button onClick={EditCaption}>Edit</button>}
+                </div>
+
             </div>
             <div className="w-[50%]">
                 <div className="flex gap-1 pl-2">
@@ -128,6 +158,6 @@ function Post() {
                 </div>
                 <div></div>
             </div>
-        </div>)
+        </div >)
 }
 export default Post;

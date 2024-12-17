@@ -304,6 +304,14 @@ app.post('/getSavedPost', async (req, res) => {
     res.status(200).send(user.saved);
 })
 
+app.post('/editCaption', async (req, res) => {
+    const { caption, postid } = req.body;
+    const post = await Post.findById(postid);
+    post.caption = caption;
+    await post.save();
+    res.status(200).send("edited");
+})
+
 
 io.on('connection', (socket) => {
     socket.on('error', (error) => {

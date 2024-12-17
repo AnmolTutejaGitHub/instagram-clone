@@ -5,6 +5,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import UserContext from '../context/UserContext';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Post() {
     // const location = useLocation();
@@ -14,6 +15,7 @@ function Post() {
     const [searchParams] = useSearchParams();
     const searchuser = searchParams.get("searchuser");
     const { user, setUser } = useContext(UserContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         getUserData();
@@ -79,9 +81,9 @@ function Post() {
         const isVideo = post.url.endsWith('.mp4') || post.url.endsWith('.webm');
 
         return isVideo ? (
-            <video src={post.url} className="w-48" controls />
+            <video src={post.url} className="w-48" controls onClick={() => navigate(`/post?postid=${post._id}`)} />
         ) : (
-            <img src={post.url} className="w-48" alt="post content" />
+            <img src={post.url} className="w-48" alt="post content" onClick={() => navigate(`/post?postid=${post._id}`)} />
         );
     });
 
