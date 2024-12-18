@@ -8,6 +8,8 @@ import Settings from './components/Settings';
 import Navbar from './components/Navbar';
 import Reels from './components/Reels';
 import Post from './components/Post';
+import Message from './components/Message';
+import Notification from './components/Notification';
 
 function App() {
     return (<div className='bg-black w-full h-full text-white'>
@@ -20,6 +22,8 @@ function App() {
             <Route path="/navbar" element={<Navbar />}></Route>
             <Route path="/reels" element={<Reels />}></Route>
             <Route path="/post" element={<Post />}></Route>
+            <Route path="/messages" element={<Message />}></Route>
+            <Route path="/notifications" element={<Notification />}></Route>
         </Routes>
         <Navbar />
     </div>);

@@ -23,12 +23,12 @@ function Navbar() {
         </div>
 
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1" onClick={() => navigate(`/messages`)}>
             <AiOutlineMessage />
             <div>Messages</div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1" onClick={() => navigate(`/notifications`)}>
             <CiHeart />
             <div>Notifications</div>
         </div>

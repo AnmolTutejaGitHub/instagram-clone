@@ -12,7 +12,7 @@ const CommentSchema = new mongoose.Schema({
         default: Date.now
     },
     RefTo: {
-        type: String //post/reel id
+        type: String //post/reel id comment id
     },
     replies: [String] // id
 })

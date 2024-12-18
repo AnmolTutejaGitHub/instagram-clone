@@ -22,7 +22,7 @@ function Reels() {
                         src={reel.url}
                         className="w-96 max-w-full rounded-lg shadow-lg"
                         controls
-                        autoPlay
+                        // autoPlay
                         loop
                     />
                 </div>

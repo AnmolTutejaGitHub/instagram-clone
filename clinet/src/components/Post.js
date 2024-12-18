@@ -8,6 +8,7 @@ import UserContext from '../context/UserContext';
 import { FaHeart } from "react-icons/fa";
 import { GoBookmarkSlash } from "react-icons/go";
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
 
 function Post() {
     const [searchParams] = useSearchParams();
@@ -20,6 +21,10 @@ function Post() {
     const [creator, setCreator] = useState(false);
     const [caption, setCaption] = useState('');
     const [isDisable, setDisable] = useState(true);
+    const [isVideo, setIsVideo] = useState(false);
+    const [postComments, setPostComments] = useState([]);
+    const navigate = useNavigate();
+
 
     async function getPost() {
         try {
@@ -29,6 +34,7 @@ function Post() {
             setPost(response.data);
             if (response.data.user == user) setCreator(true);
             if (response.data.user == user) setDisable(false);
+            if (response.data.url.endsWith('.mp4')) setIsVideo(true);
 
         } catch (e) {
             console.log("Post does not exist");
@@ -109,6 +115,33 @@ function Post() {
         }
     }
 
+    async function CommentToPost() {
+        const response = await axios.post(`http://localhost:8080/comment`, {
+            postid: postid,
+            username: user,
+            comment: Comment
+        })
+        setPostComments([...postComments, response.data]);
+        setComment('');
+    }
+
+    async function getComments() {
+        const response = await axios.post(`http://localhost:8080/getComments`, {
+            refId: postid
+        })
+        setPostComments(response.data);
+    }
+
+    const renderComments = postComments.map((cmt) => {
+        return <div>
+            <div className="flex gap-4">
+                <div className="text-pink-600 cursor-pointer" onClick={() => navigate(`/profile?searchuser=${cmt.user}`)}>{cmt.user}</div>
+                <div className="text-sm text-gray-400">{cmt.createdAt}</div>
+            </div>
+            <div>{cmt.text}</div>
+        </div>
+    })
+
     useEffect(() => {
         getData();
     }, [])
@@ -117,6 +150,7 @@ function Post() {
         await getPost();
         await wasLiked();
         await wasSaved();
+        await getComments();
     }
 
     return (
@@ -126,7 +160,8 @@ function Post() {
                     <p>{post.user}</p>
                     <p className='text-[#A8A8A8]'>{post.createdAt}</p>
                 </div>
-                <img src={post.url} className='w-auto rounded-sm border-1 border-[#262626] max-h-[60%]' />
+                {!isVideo && <img src={post.url} className='w-auto rounded-sm border-1 border-[#262626] max-h-[60%]' />}
+                {isVideo && <video src={post.url} controls className='w-auto rounded-sm border-1 border-[#262626] max-h-[60%]' />}
                 <div className='flex gap-4 text-[25px] text-[#A8A8A8]'>
                     {!isLiked && <IoIosHeartEmpty onClick={likePost} />}
                     {isLiked && <FaHeart className="text-red-500" onClick={unlikePost} />}
@@ -149,14 +184,14 @@ function Post() {
             </div>
             <div className="w-[50%]">
                 <div className="flex gap-1 pl-2">
-                    <div>{post.comments?.length}</div>
+                    <div>{postComments.length}</div>
                     <div>Comments</div>
                 </div>
                 <div className="flex gap-4 p-2">
                     <input placeholder="Add a comment..." className="bg-inherit border-b border-white w-full outline-none" value={Comment} onChange={(e) => setComment(e.target.value)} />
-                    <button className={` cursor-pointer ${Comment === '' ? 'text-blue-200' : 'text-blue-400'}`} disabled >post</button>
+                    <button className={` cursor-pointer ${Comment === '' ? 'text-blue-200' : 'text-blue-400'}`} onClick={CommentToPost} >post</button>
                 </div>
-                <div></div>
+                <div>{renderComments}</div>
             </div>
         </div >)
 }

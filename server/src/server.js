@@ -13,6 +13,8 @@ const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const Post = require('../database/Models/Post');
+const Comments = require('../database/Models/Comments');
+const Notification = require('../database/Models/Notification');
 
 app.use(cors({
     origin: `http://localhost:3000`,
@@ -251,6 +253,15 @@ app.post('/likePost', async (req, res) => {
     const post = await Post.findById(postid);
     post.likes.push(username);
     await post.save();
+
+    const notification = new Notification({
+        user: post.user,
+        sender: username,
+        message: `liked your post`,
+        refId: postid
+    })
+    await notification.save();
+
     res.status(200).send("post liked");
 })
 
@@ -310,6 +321,43 @@ app.post('/editCaption', async (req, res) => {
     post.caption = caption;
     await post.save();
     res.status(200).send("edited");
+})
+
+
+app.post('/comment', async (req, res) => {
+    const { username, postid, comment } = req.body;
+    const post = await Post.findById(postid);
+    const Comment = new Comments({
+        user: username,
+        text: comment,
+        RefTo: postid
+    })
+
+    await Comment.save();
+    post.comments.push(Comment._id);
+    await post.save();
+
+    const notification = new Notification({
+        user: post.user,
+        sender: username,
+        message: `commented on  your post`,
+        refId: postid
+    })
+    await notification.save();
+
+    res.status(200).send(Comment);
+})
+
+app.post('/getComments', async (req, res) => {
+    const { refId } = req.body;
+    const comments = await Comments.find({ RefTo: refId });
+    res.status(200).send(comments);
+})
+
+app.post('/getUserNotifications', async (req, res) => {
+    const { username } = req.body;
+    const notifications = await Notification.find({ user: username }).sort({ createdAt: -1 });
+    res.status(200).send(notifications);
 })
 
 
