@@ -15,6 +15,7 @@ const cloudinary = require('cloudinary').v2;
 const Post = require('../database/Models/Post');
 const Comments = require('../database/Models/Comments');
 const Notification = require('../database/Models/Notification');
+const { Story } = require('../database/Models/Stroy');
 
 app.use(cors({
     origin: `http://localhost:3000`,
@@ -153,6 +154,21 @@ app.post('/fileupload', upload.single('uploadfile'), async (req, res) => {
     user.posts.push(post._id.toString());
     await user.save();
     res.status(200).send(post);
+});
+
+app.post('/storyupload', upload.single('storyfile'), async (req, res) => {
+    const { username } = req.body;
+
+    const story = new Story({
+        user: username,
+        url: req.file.path,
+    });
+    await story.save();
+
+    const user = await User.findOne({ name: username });
+    user.stories.push(story);
+    await user.save();
+    res.status(200).send(story);
 });
 
 
@@ -350,7 +366,7 @@ app.post('/comment', async (req, res) => {
 
 app.post('/getComments', async (req, res) => {
     const { refId } = req.body;
-    const comments = await Comments.find({ RefTo: refId });
+    const comments = await Comments.find({ RefTo: refId }).sort({ createdAt: -1 });
     res.status(200).send(comments);
 })
 

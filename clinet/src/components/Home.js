@@ -7,6 +7,8 @@ import { IoIosHeartEmpty } from "react-icons/io";
 import { FaRegComment } from "react-icons/fa";
 import { CiBookmark } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa";
+import Story from '../components/Stroy';
+import { IoMdClose } from "react-icons/io";
 
 function Home() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +17,7 @@ function Home() {
     const { user, setUser } = useContext(UserContext);
     const notify = () => toast.error("Username doesn't exist");
     const [followingposts, setFollowingposts] = useState([]);
+    const [storyComp, setStoryComp] = useState(false);
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
@@ -99,6 +102,12 @@ function Home() {
 
 
     return (<div>
+        {storyComp &&
+            <div className="w-[100vw] h-[100vh] fixed z-50 flex justify-center items-center backdrop-blur-md">
+                <div className='absolute top-2 right-2' onClick={() => setStoryComp(false)}><IoMdClose /></div>
+                <Story />
+            </div>
+        }
         <Toaster position="top-center" reverseOrder={false} />
         <div className='flex justify-center pt-4 flex-col items-center'>
             <input placeholder="Search" onKeyDown={handleKeyDown} onChange={(e) => setSearchTerm(e.target.value)} value={searchTerm}
@@ -111,7 +120,7 @@ function Home() {
                     src={userObj.profilePicture || `https://avatar.iran.liara.run/public/boy`}
                     className='w-14'
                 />
-                <FaPlus className='absolute bottom-2 right-[-1px] bg-blue-600 p-1 rounded-xl' />
+                <FaPlus className='absolute bottom-2 right-[-1px] bg-blue-600 p-1 rounded-xl' onClick={() => setStoryComp(true)} />
             </div>
         </div>
 
