@@ -9,6 +9,7 @@ import { CiBookmark } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa";
 import Story from '../components/Stroy';
 import { IoMdClose } from "react-icons/io";
+import UserStories from './UserStories';
 
 function Home() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +19,7 @@ function Home() {
     const notify = () => toast.error("Username doesn't exist");
     const [followingposts, setFollowingposts] = useState([]);
     const [storyComp, setStoryComp] = useState(false);
+    const [stories, setStories] = useState([]);
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
@@ -41,11 +43,11 @@ function Home() {
     async function fetchData() {
         await getUserData();
         await getFollowingPosts();
+        await getFollowingStories();
     }
 
     useEffect(() => {
         fetchData();
-        console.log(followingposts);
     }, [])
 
 
@@ -101,6 +103,22 @@ function Home() {
     }
 
 
+    async function getFollowingStories() {
+        const response = await axios.post(`http://localhost:8080/getFollowingStories`, {
+            username: user
+        })
+        setStories(response.data);
+        console.log(response.data);
+    }
+
+    const renderStories = stories.map((userStories) => {
+        console.log("hello", userStories);
+        return <div>
+            <img src='https://avatar.iran.liara.run/public/boy' className='w-14 rounded-full border-2 border-pink-600' onClick={() => navigate('/stories', { state: userStories })}></img>
+        </div>
+    })
+
+
     return (<div>
         {storyComp &&
             <div className="w-[100vw] h-[100vh] fixed z-50 flex justify-center items-center backdrop-blur-md">
@@ -114,14 +132,15 @@ function Home() {
                 className="p-2 bg-[#363636] rounded-lg outline-none w-[70%] text-[#A8A8A8]"></input>
         </div>
 
-        <div className='p-4 pl-11'>
-            <div className='flex absolute'>
+        <div className='p-4 pl-11 flex flex-row gap-4'>
+            <div className='flex'>
                 <img
                     src={userObj.profilePicture || `https://avatar.iran.liara.run/public/boy`}
                     className='w-14'
                 />
                 <FaPlus className='absolute bottom-2 right-[-1px] bg-blue-600 p-1 rounded-xl' onClick={() => setStoryComp(true)} />
             </div>
+            <div className=''>{renderStories}</div>
         </div>
 
         <div className='p-2 flex flex-col justify-center items-center gap-16'>{renderFollowingPosts}</div>

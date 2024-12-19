@@ -10,6 +10,7 @@ import Reels from './components/Reels';
 import Post from './components/Post';
 import Message from './components/Message';
 import Notification from './components/Notification';
+import UserStories from './components/UserStories';
 
 function App() {
     return (<div className='bg-black w-full h-full text-white'>
@@ -24,6 +25,7 @@ function App() {
             <Route path="/post" element={<Post />}></Route>
             <Route path="/messages" element={<Message />}></Route>
             <Route path="/notifications" element={<Notification />}></Route>
+            <Route path="/stories" element={<UserStories />}></Route>
         </Routes>
         <Navbar />
     </div>);

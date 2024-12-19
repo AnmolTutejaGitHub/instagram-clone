@@ -376,6 +376,33 @@ app.post('/getUserNotifications', async (req, res) => {
     res.status(200).send(notifications);
 })
 
+app.post('/getFollowingStories', async (req, res) => {
+    const { username } = req.body;
+    const user = await User.findOne({ name: username });
+    const following = user.following;
+    const storiesByFollowing = await Story.aggregate([
+        {
+            $match: {
+                user: { $in: following }
+            }
+        },
+        {
+            $group: {
+                _id: "$user",
+                stories: { $push: "$$ROOT" }
+            }
+        }
+    ]);
+    const result = storiesByFollowing.map(item => {
+        return {
+            user: item._id,
+            stories: item.stories
+        };
+    });
+
+    res.status(200).send(result);
+})
+
 
 io.on('connection', (socket) => {
     socket.on('error', (error) => {
