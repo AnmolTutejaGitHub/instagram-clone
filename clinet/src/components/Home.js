@@ -107,17 +107,35 @@ function Home() {
         const response = await axios.post(`http://localhost:8080/getFollowingStories`, {
             username: user
         })
-        setStories(response.data);
         console.log(response.data);
+        setStories(response.data);
     }
 
     const renderStories = stories.map((userStories) => {
-        console.log("hello", userStories);
+        console.log(userStories);
         return <div>
-            <img src='https://avatar.iran.liara.run/public/boy' className='w-14 rounded-full border-2 border-pink-600' onClick={() => navigate('/stories', { state: userStories })}></img>
+            <img src='https://avatar.iran.liara.run/public/boy' className={`w-14 rounded-full border-2 border-pink-600 ${userStories.stories[0].viewers.includes(user) ? `border-white` : ''}`} onClick={() => storyClicked(userStories)}></img>
         </div>
     })
 
+    async function storyClicked(userStories) {
+        const response = await axios.post(`http://localhost:8080/addView`, {
+            viewer: user,
+            stories: userStories.stories
+        });
+
+        // for (let i = 0; i < stories.length; i++) {
+        //     let viewers = stories[i].stories[0].viewers;
+        //     console.log(viewers);
+        //     viewers.push(user);
+        //     let StoryObj = { ...stories[i].stories[0], viewers };
+        //     // does actuallt override ? storyObj override story[i]?
+        //     //stories[i] = StoryObj;
+        //     // setStories(...stories);
+        //     setStories([...stories, StoryObj]);
+        // }
+        navigate('/stories', { state: userStories });
+    }
 
     return (<div>
         {storyComp &&
@@ -133,7 +151,7 @@ function Home() {
         </div>
 
         <div className='p-4 pl-11 flex flex-row gap-4'>
-            <div className='flex'>
+            <div className='flex sticky'>
                 <img
                     src={userObj.profilePicture || `https://avatar.iran.liara.run/public/boy`}
                     className='w-14'

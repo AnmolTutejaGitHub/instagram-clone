@@ -27,7 +27,6 @@ function UserStories() {
                 wheel: true,
                 drag: true,
                 arrows: false,
-                rewind: true,
             }}
         >
             {renderStories}

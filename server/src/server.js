@@ -403,6 +403,18 @@ app.post('/getFollowingStories', async (req, res) => {
     res.status(200).send(result);
 })
 
+app.post('/addView', async (req, res) => {
+    const { viewer, stories } = req.body;
+
+    for (let i = 0; i < stories.length; i++) {
+        const sty = await Story.findById(stories[i]._id);
+        console.log(sty);
+        if (!sty.viewers.includes(viewer)) sty.viewers.push(viewer);
+        await sty.save();
+    }
+    res.status(200).send('Viewer added');
+})
+
 
 io.on('connection', (socket) => {
     socket.on('error', (error) => {
