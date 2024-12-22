@@ -44,7 +44,7 @@ function Story() {
 
     return (
         <div className="bg-[#D9D9D9] h-[50vh] w-[50vw] rounded-md p-4 flex items-center justify-center shadow-lg">
-            <div className="p-8 border-dotted border-2 border-blue-600 rounded-md bg-[#D9D9D9]">
+            <div className="p-6 border-dotted border-2 border-blue-600 rounded-md bg-[#D9D9D9]">
                 <form
                     encType="multipart/form-data"
                     className="uploadform flex gap-4 items-center"

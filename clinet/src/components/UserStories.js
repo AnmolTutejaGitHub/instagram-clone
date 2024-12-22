@@ -21,6 +21,7 @@ function UserStories() {
         </SplideSlide>
     })
     return <div>
+        <div className='text-center p-2 text-lg'>{stories.user}</div>
         <Splide
             options={{
                 height: '90vh',

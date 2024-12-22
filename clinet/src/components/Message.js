@@ -119,7 +119,8 @@ function Message() {
             />
         </div>
         {error && <p className="text-red-600">*{error}</p>}
-        <div className="flex flex-col p-4">{renderFriends}</div>
+        {friends.length > 0 && <div className="flex flex-col p-4">{renderFriends}</div>}
+        {friends.length == 0 && <div className="text-center pt-4">Search someone to start a conversation with them</div>}
     </div>)
 }
 export default Message;

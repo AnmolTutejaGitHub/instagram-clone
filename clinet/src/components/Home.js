@@ -113,7 +113,7 @@ function Home() {
 
     const renderStories = stories.map((userStories) => {
         console.log(userStories);
-        return <div>
+        return <div className=''>
             <img src='https://avatar.iran.liara.run/public/boy' className={`w-14 rounded-full border-2 border-pink-600 ${userStories.stories[0].viewers.includes(user) ? `border-white` : ''}`} onClick={() => storyClicked(userStories)}></img>
         </div>
     })
@@ -158,10 +158,11 @@ function Home() {
                 />
                 <FaPlus className='absolute bottom-2 right-[-1px] bg-blue-600 p-1 rounded-xl' onClick={() => setStoryComp(true)} />
             </div>
-            <div className=''>{renderStories}</div>
+            <div className='flex gap-2'>{renderStories}</div>
         </div>
 
-        <div className='p-2 flex flex-col justify-center items-center gap-16'>{renderFollowingPosts}</div>
+        {followingposts.length > 0 && <div className='p-2 flex flex-col justify-center items-center gap-16'>{renderFollowingPosts}</div>}
+        {followingposts.length == 0 && <div className='text-center'>Follow Someone to see their posts here</div>}
     </div>)
 }
 export default Home;
