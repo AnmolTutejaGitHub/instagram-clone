@@ -2,12 +2,14 @@ import { useState, useContext, useEffect } from 'react';
 import UserContext from '../context/UserContext';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function Settings() {
     const [userObj, setUserObj] = useState({});
     const { user, setUser } = useContext(UserContext);
     const [bio, setBio] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     async function getUserData() {
         try {
@@ -36,9 +38,14 @@ function Settings() {
         } finally {
             toast.dismiss(toastId);
         }
-
     }
 
+    function logout() {
+        localStorage.removeItem('token');
+        setUser(null);
+        sessionStorage.removeItem('user');
+        navigate('/');
+    }
     useEffect(() => {
         getUserData();
     })
@@ -73,7 +80,10 @@ function Settings() {
                 </div>
             </div>
 
-            <button className='bg-[#0095F6] hover:bg-blue-500 w-16 p-2 rounded-md' onClick={EditProfile}>submit</button>
+            <div className='flex gap-2'>
+                <button className='bg-[#0095F6] hover:bg-blue-500 w-16 p-2 rounded-md' onClick={logout}>Logout</button>
+                <button className='bg-[#0095F6] hover:bg-blue-500 w-16 p-2 rounded-md' onClick={EditProfile}>submit</button>
+            </div>
         </div >)
 }
 export default Settings;

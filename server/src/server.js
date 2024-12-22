@@ -67,6 +67,18 @@ app.post('/signups', async (req, res) => {
     }
 })
 
+app.post('/resetPassword', async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) return res.status(400).send({ error: 'Email is not registered with us' });
+        user.password = req.body.password;
+        await user.save();
+        res.status(200).send('success');
+    } catch (e) {
+        res.status(400).send(e);
+    }
+})
+
 app.post('/verifytokenAndGetUsername', async (req, res) => {
     const { token } = req.body;
 

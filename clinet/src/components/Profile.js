@@ -99,6 +99,46 @@ function Profile() {
         }
     }
 
+    async function getSearchedUserId(name) {
+        try {
+            const response = await axios.post(`http://localhost:8080/findUser`, {
+                searchUser: name
+            });
+
+            return response.data;
+
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
+    }
+
+    async function EstablishDM() {
+        const receiver = searchuser;
+        const receiver_id = await getSearchedUserId(searchuser);
+        const sender_id = await getSearchedUserId(user);
+
+        if (receiver_id && sender_id) {
+            const room = sender_id + receiver_id;
+
+            const sortedRoomName = room.split('').sort().join('');
+
+            await axios.post(`http://localhost:8080/createOrGetDMRoom`, {
+                room_name: sortedRoomName,
+                receiver,
+                sender: user
+            });
+
+            const roomData = {
+                sender: user,
+                receiver: receiver,
+                room: sortedRoomName
+            }
+
+            navigate(`/DMroom`, { state: roomData });
+        }
+    }
+
     return (<div className='flex justify-center gap-4 flex-col items-center'>
 
         <div className='flex gap-4 p-4'>
@@ -127,7 +167,7 @@ function Profile() {
                 <div className='pt-2'>{userObj.bio || 'Bio'}</div>
                 {user != userObj?.name &&
                     <div className='flex gap-2 pt-4'>
-                        <div className='bg-[#363636] p-2 rounded-md text-sm cursor-pointer'>Message</div>
+                        <div className='bg-[#363636] p-2 rounded-md text-sm cursor-pointer' onClick={EstablishDM}>Message</div>
                         {!isFollowing && <div className='bg-[#1977F2] p-2 rounded-md text-sm cursor-pointer' onClick={follow}>Follow</div>}
                         {isFollowing && <div className='bg-[#363636] p-2 rounded-md text-sm cursor-pointer' onClick={unFollow}>Following</div>}
                     </div>
