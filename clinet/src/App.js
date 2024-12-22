@@ -11,6 +11,7 @@ import Post from './components/Post';
 import Message from './components/Message';
 import Notification from './components/Notification';
 import UserStories from './components/UserStories';
+import Room from './components/Room';
 
 function App() {
     return (<div className='bg-black w-full h-full text-white'>
@@ -26,6 +27,7 @@ function App() {
             <Route path="/messages" element={<Message />}></Route>
             <Route path="/notifications" element={<Notification />}></Route>
             <Route path="/stories" element={<UserStories />}></Route>
+            <Route path="/DMroom" element={<Room />}></Route>
         </Routes>
         <Navbar />
     </div>);

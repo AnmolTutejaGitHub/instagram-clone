@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema({
         maxLength: 160,
     },
     stories: [storySchema],
+    chatted: [String]
 })
 
 userSchema.pre('save', async function (next) {

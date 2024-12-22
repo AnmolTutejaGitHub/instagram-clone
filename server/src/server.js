@@ -16,6 +16,8 @@ const Post = require('../database/Models/Post');
 const Comments = require('../database/Models/Comments');
 const Notification = require('../database/Models/Notification');
 const { Story } = require('../database/Models/Stroy');
+const Message = require('../database/Models/Message');
+const Room = require('../database/Models/Room');
 
 app.use(cors({
     origin: `http://localhost:3000`,
@@ -415,13 +417,101 @@ app.post('/addView', async (req, res) => {
     res.status(200).send('Viewer added');
 })
 
+app.post('/getFollowingList', async (req, res) => {
+    const { username } = req.body;
+    const user = await User.findOne({ name: username });
+    res.status(200).send(user.following);
+})
+
+app.post('/findUser', async (req, res) => {
+    const { searchUser } = req.body;
+    try {
+        const user = await User.findOne({ name: searchUser.trim() });
+        if (!user) res.status(400).send({ message: "User does not exist" });
+
+        else res.status(200).send(user._id.toString());
+
+    } catch (e) {
+        res.status(400).send({ message: "User does not exist" });
+    }
+})
+
+app.post('/createOrGetDMRoom', async (req, res) => {
+    const Sender = await User.findOne({ name: req.body.sender });
+    const Receiver = await User.findOne({ name: req.body.receiver });
+
+    if (!Sender.chatted.includes(req.body.receiver)) Sender.chatted.push(req.body.receiver);
+    if (!Receiver.chatted.includes(req.body.sender)) Receiver.chatted.push(req.body.receiver);
+
+    await Sender.save();
+    await Receiver.save();
+
+    try {
+        const room = new Room({ name: req.body.room_name })
+        await room.save();
+        res.status(200).send(room);
+    } catch (e) {
+        // --> already created
+        res.status(200).send({ message: "already DMed once" });
+    }
+})
+
+app.post('/getFriends', async (req, res) => {
+    const username = req.body.user;
+    try {
+        const user = await User.findOne({ name: username });
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+        res.status(200).send(user.chatted);
+    }
+    catch (e) {
+        res.status(400).send(e);
+    }
+})
+
+app.post('/roomMessages', async (req, res) => {
+    const room = req.body.room_name;
+    try {
+        const messages = await Message.find({ room_name: room }).sort({ date: 1 });
+        res.send(messages);
+    } catch (err) {
+        res.status(400).send(e);
+    }
+})
+
+
 
 io.on('connection', (socket) => {
-    socket.on('error', (error) => {
-        console.error('WebSocket error:', error);
-    });
+    console.log('clinet has joined');
 
-    socket.on('disconnect', async () => { });
+    socket.on('joinDM', async ({ sender, receiver, room }) => {
+        try {
+            socket.join(room);
+        } catch (e) {
+            console.log(e);
+        }
+    })
+
+    socket.on('SendDMMessage', async ({ room_name, msg, sender }) => {
+        const date = new Date();
+        const timestamp = date.toLocaleString('en-US', {
+            day: 'numeric',
+            month: 'short',
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZone: 'Asia/Kolkata'
+        });
+
+        io.to(room_name).emit('DMMessage', { msg, sender, timestamp });
+        const message = new Message({ room_name, message: msg, username: sender, timestamp, date: date });
+        await message.save();
+    })
+
+
+    socket.on('disconnect', () => {
+        console.log('client has left');
+    })
 })
 
 server.listen(PORT, () => {
